@@ -2,7 +2,6 @@
 using Net.Chdk.Model.Software;
 using Net.Chdk.Providers;
 using Net.Chdk.Providers.Product;
-using System;
 using System.IO;
 using System.Linq;
 
