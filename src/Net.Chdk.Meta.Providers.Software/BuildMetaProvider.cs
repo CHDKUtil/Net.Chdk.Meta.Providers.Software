@@ -1,9 +1,7 @@
-﻿using Net.Chdk;
-using Net.Chdk.Meta.Providers.Software;
+﻿using Microsoft.Extensions.Logging;
 using Net.Chdk.Model.Software;
+using Net.Chdk.Providers;
 using Net.Chdk.Providers.Product;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,43 +9,48 @@ using System.Linq;
 
 namespace Net.Chdk.Meta.Providers.Software
 {
-    sealed class BuildMetaProvider : IBuildMetaProvider
+    sealed class BuildMetaProvider : DataProvider<Dictionary<Version, SoftwareBuildInfo>[]>, IBuildMetaProvider
     {
+        #region Constants
+
+        private const string DataFileName = "builds.json";
+
+        #endregion
+
+        #region Fields
+
         private IProductProvider ProductProvider { get; }
 
-        public BuildMetaProvider(IProductProvider productProvider)
+        #endregion
+
+        #region Constructor
+
+        public BuildMetaProvider(IProductProvider productProvider, ILogger<BuildMetaProvider> logger)
+            : base(logger)
         {
             ProductProvider = productProvider;
-            _builds = new Lazy<Dictionary<Version, SoftwareBuildInfo>[]>(GetBuilds);
         }
+
+        #endregion
+
+        #region IBetaBuildProvider Members
 
         public SoftwareBuildInfo GetBuild(SoftwareInfo software)
         {
             if (software.Camera != null)
-                return Builds[0][software.Product.Version];
+                return Data[0][software.Product.Version];
             else
-                return Builds[1][software.Product.Version];
+                return Data[1][software.Product.Version];
         }
 
-        #region Builds
+        #endregion
 
-        private readonly Lazy<Dictionary<Version, SoftwareBuildInfo>[]> _builds;
+        #region Data
 
-        private Dictionary<Version, SoftwareBuildInfo>[] Builds => _builds.Value;
-
-        private Dictionary<Version, SoftwareBuildInfo>[] GetBuilds()
+        protected override string GetFilePath()
         {
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new[] { new VersionConverter() }
-            };
             var productName = ProductProvider.GetProductNames().Single();
-            var path = Path.Combine(Directories.Data, Directories.Product, productName, "builds.json");
-            using (var reader = new StreamReader(path))
-            using (var jsonReader = new JsonTextReader(reader))
-            {
-                return JsonSerializer.CreateDefault(settings).Deserialize<Dictionary<Version, SoftwareBuildInfo>[]>(jsonReader);
-            }
+            return Path.Combine(Directories.Data, Directories.Product, productName, DataFileName);
         }
 
         #endregion

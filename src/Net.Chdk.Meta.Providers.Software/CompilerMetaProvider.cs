@@ -1,50 +1,55 @@
-﻿using Net.Chdk.Model.Software;
+﻿using Microsoft.Extensions.Logging;
+using Net.Chdk.Model.Software;
+using Net.Chdk.Providers;
 using Net.Chdk.Providers.Product;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.IO;
 using System.Linq;
 
 namespace Net.Chdk.Meta.Providers.Software
 {
-    sealed class CompilerMetaProvider : ICompilerMetaProvider
+    sealed class CompilerMetaProvider : DataProvider<SoftwareCompilerInfo[]>, ICompilerMetaProvider
     {
+        #region Constants
+
+        private const string DataFileName = "compilers.json";
+
+        #endregion
+
+        #region Fields
+
         private IProductProvider ProductProvider { get; }
 
-        public CompilerMetaProvider(IProductProvider productProvider)
+        #endregion
+
+        #region Constructor
+
+        public CompilerMetaProvider(IProductProvider productProvider, ILogger<CompilerMetaProvider> logger)
+            : base(logger)
         {
             ProductProvider = productProvider;
-            _compilers = new Lazy<SoftwareCompilerInfo[]>(GetCompilers);
         }
+
+        #endregion
+
+        #region ICompilerMetaProvider Members
 
         public SoftwareCompilerInfo GetCompiler(SoftwareInfo software)
         {
             if (software.Camera != null)
-                return Compilers[0];
+                return Data[0];
             else
-                return Compilers[1];
+                return Data[1];
         }
 
-        #region Compilers
+        #endregion
 
-        private readonly Lazy<SoftwareCompilerInfo[]> _compilers;
+        #region Data
 
-        private SoftwareCompilerInfo[] Compilers => _compilers.Value;
-
-        private SoftwareCompilerInfo[] GetCompilers()
+        protected override string GetFilePath()
         {
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new[] { new VersionConverter() }
-            };
             var productName = ProductProvider.GetProductNames().Single();
-            var path = Path.Combine(Directories.Data, Directories.Product, productName, "compilers.json");
-            using (var reader = new StreamReader(path))
-            using (var jsonReader = new JsonTextReader(reader))
-            {
-                return JsonSerializer.CreateDefault(settings).Deserialize<SoftwareCompilerInfo[]>(jsonReader);
-            }
+            return Path.Combine(Directories.Data, Directories.Product, productName, DataFileName);
         }
 
         #endregion
