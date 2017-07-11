@@ -38,6 +38,9 @@
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.Extensions.Logging.Abstractions.1.1.2\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Net.Chdk.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\visual studio 2017\Projects\SdmCameraList\packages\Net.Chdk.Core.0.1.0-alpha\lib\netstandard1.0\Net.Chdk.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -66,10 +69,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Net.Chdk.Core\src\Net.Chdk.Core\Net.Chdk.Core.csproj">
-      <Project>{6C183A9C-30C1-47E5-9016-48890EC8ABA2}</Project>
-      <Name>Net.Chdk.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Net.Chdk.Meta.Providers.Software.Core\src\Net.Chdk.Meta.Providers.Software.Core\Net.Chdk.Meta.Providers.Software.Core.csproj">
       <Project>{3618B309-0690-43DC-9C1E-32DF42D0F43C}</Project>
       <Name>Net.Chdk.Meta.Providers.Software.Core</Name>
