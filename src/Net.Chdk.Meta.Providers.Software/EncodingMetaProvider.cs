@@ -1,5 +1,8 @@
 ﻿using Net.Chdk.Model.Software;
+using Net.Chdk.Providers.Boot;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Net.Chdk.Meta.Providers.Software
 {
@@ -7,7 +10,24 @@ namespace Net.Chdk.Meta.Providers.Software
     {
         #region Fields
 
-        private Dictionary<uint, SoftwareEncodingInfo> Encodings => new Dictionary<uint, SoftwareEncodingInfo>();
+        private static readonly SoftwareEncodingInfo EmptyEncoding = new SoftwareEncodingInfo
+        {
+            Name = string.Empty
+        };
+
+        private int[][] Offsets { get; }
+
+        #endregion
+
+        #region Constructor
+
+        public EncodingMetaProvider(IBootProviderResolver bootProviderResolver)
+        {
+            var bootProvider = bootProviderResolver.GetBootProvider("PS");
+            Offsets = bootProvider.Offsets;
+
+            _encodings = new Lazy<Dictionary<uint, SoftwareEncodingInfo>>(GetEncodings);
+        }
 
         #endregion
 
@@ -15,42 +35,49 @@ namespace Net.Chdk.Meta.Providers.Software
 
         public SoftwareEncodingInfo GetEncoding(SoftwareInfo software)
         {
-            var key = software.Encoding.Data ?? 0;
-            SoftwareEncodingInfo encoding;
-            if (!Encodings.TryGetValue(key, out encoding))
-            {
-                encoding = GetEncoding(software.Encoding.Data);
-                Encodings.Add(key, encoding);
-            }
-            return encoding;
+            return Encodings[software.Encoding.Data ?? 0];
         }
 
         #endregion
 
         #region Encodings
 
-        private static SoftwareEncodingInfo GetEncoding(uint? data)
+        private readonly Lazy<Dictionary<uint, SoftwareEncodingInfo>> _encodings;
+
+        private Dictionary<uint, SoftwareEncodingInfo> Encodings => _encodings.Value;
+
+        private Dictionary<uint, SoftwareEncodingInfo> GetEncodings()
         {
-            return data.HasValue
-                ? GetEncoding(data.Value)
-                : GetEmptyEncoding();
+            var length = Offsets != null
+                ? Offsets.Length
+                : 1;
+            return Enumerable.Range(0, length)
+                .Select(GetOffsets)
+                .ToDictionary(e => e.Data.HasValue ? e.Data.Value : 0, e => e);
         }
 
-        private static SoftwareEncodingInfo GetEmptyEncoding()
+        private SoftwareEncodingInfo GetOffsets(int i)
         {
-            return new SoftwareEncodingInfo
-            {
-                Name = string.Empty
-            };
+            return i > 0
+                ? GetEncoding(Offsets[i - 1])
+                : EmptyEncoding;
         }
 
-        private static SoftwareEncodingInfo GetEncoding(uint offsets)
+        private static SoftwareEncodingInfo GetEncoding(int[] offsets)
         {
             return new SoftwareEncodingInfo
             {
                 Name = "dancingbits",
-                Data = offsets,
+                Data = GetOffsets(offsets),
             };
+        }
+
+        private static uint? GetOffsets(int[] offsets)
+        {
+            var uOffsets = 0u;
+            for (int index = 0; index < offsets.Length; index++)
+                uOffsets += (uint)offsets[index] << (index << 2);
+            return uOffsets;
         }
 
         #endregion

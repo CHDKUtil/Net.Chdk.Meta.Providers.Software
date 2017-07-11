@@ -86,6 +86,10 @@
       <Project>{3e5df136-e7c5-4aca-b065-3e6e36217645}</Project>
       <Name>Net.Chdk.Providers.Base</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Net.Chdk.Providers.Boot.Core\src\Net.Chdk.Providers.Boot.Core\Net.Chdk.Providers.Boot.Core.csproj">
+      <Project>{4E4FA15A-4A88-4CAF-A8E1-FC507177EAD4}</Project>
+      <Name>Net.Chdk.Providers.Boot.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Net.Chdk.Providers.Category.Core\src\Net.Chdk.Providers.Category.Core\Net.Chdk.Providers.Category.Core.csproj">
       <Project>{05B4FC36-AB60-48A6-A12C-0D8BB73843DD}</Project>
       <Name>Net.Chdk.Providers.Category.Core</Name>
