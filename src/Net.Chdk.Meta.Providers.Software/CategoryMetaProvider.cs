@@ -12,7 +12,7 @@ namespace Net.Chdk.Meta.Providers.Software
 
         public CategoryMetaProvider(ICategoryProvider categoryProvider)
         {
-            Categories = categoryProvider.GetCategories() .ToDictionary(
+            Categories = categoryProvider.GetCategories().ToDictionary(
                 c => c.Name,
                 c => c);
         }
