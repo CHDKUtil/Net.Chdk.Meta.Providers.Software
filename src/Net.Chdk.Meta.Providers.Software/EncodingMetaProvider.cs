@@ -7,18 +7,7 @@ namespace Net.Chdk.Meta.Providers.Software
     {
         #region Fields
 
-        private IBootMetaProvider BootProvider { get; }
-        private Dictionary<uint, SoftwareEncodingInfo> Encodings { get; }
-
-        #endregion
-
-        #region Constructor
-
-        public EncodingMetaProvider(IBootMetaProvider bootProvider)
-        {
-            BootProvider = bootProvider;
-            Encodings = new Dictionary<uint, SoftwareEncodingInfo>();
-        }
+        private Dictionary<uint, SoftwareEncodingInfo> Encodings => new Dictionary<uint, SoftwareEncodingInfo>();
 
         #endregion
 
