@@ -21,10 +21,9 @@ namespace Net.Chdk.Meta.Providers.Software
 
         #region Constructor
 
-        public EncodingMetaProvider(IBootProviderResolver bootProviderResolver)
+        public EncodingMetaProvider(IBootProvider bootProvider)
         {
-            var bootProvider = bootProviderResolver.GetBootProvider("PS");
-            Offsets = bootProvider.Offsets;
+            Offsets = bootProvider.GetOffsets("PS");
 
             _encodings = new Lazy<Dictionary<uint, SoftwareEncodingInfo>>(GetEncodings);
         }
@@ -53,7 +52,7 @@ namespace Net.Chdk.Meta.Providers.Software
                 : 1;
             return Enumerable.Range(0, length)
                 .Select(GetOffsets)
-                .ToDictionary(e => e.Data.HasValue ? e.Data.Value : 0, e => e);
+                .ToDictionary(e => e.Data ?? 0, e => e);
         }
 
         private SoftwareEncodingInfo GetOffsets(int i)
