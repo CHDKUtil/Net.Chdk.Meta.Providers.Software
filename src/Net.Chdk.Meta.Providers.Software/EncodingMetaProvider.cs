@@ -10,11 +10,6 @@ namespace Net.Chdk.Meta.Providers.Software
     {
         #region Fields
 
-        private static readonly SoftwareEncodingInfo EmptyEncoding = new SoftwareEncodingInfo
-        {
-            Name = string.Empty
-        };
-
         private int[][] Offsets { get; }
 
         #endregion
@@ -59,7 +54,7 @@ namespace Net.Chdk.Meta.Providers.Software
         {
             return i > 0
                 ? GetEncoding(Offsets[i - 1])
-                : EmptyEncoding;
+                : SoftwareEncodingInfo.Empty;
         }
 
         private static SoftwareEncodingInfo GetEncoding(int[] offsets)
